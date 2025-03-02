@@ -26,8 +26,8 @@ A lightweight, minimalist course app designed for creators who want a quick and 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/kitcourse.git
-   cd kitcourse
+   git clone https://github.com/mattragland/kitcourses.git
+   cd kitcourses
    ```
 
 2. Install dependencies:
