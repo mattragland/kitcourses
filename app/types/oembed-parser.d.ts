@@ -11,5 +11,9 @@ declare module 'oembed-parser' {
     [key: string]: any;
   }
 
-  export function extract(url: string): Promise<OEmbedData>;
+  export interface ExtractOptions {
+    params?: Record<string, string>;
+  }
+
+  export function extract(url: string, options?: ExtractOptions): Promise<OEmbedData>;
 } 

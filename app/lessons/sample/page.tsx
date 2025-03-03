@@ -53,13 +53,6 @@ export default function SampleLessonPage() {
         />
       </div>
       
-      <div className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Preview</h2>
-        <div className="rounded-lg border border-gray-200 p-6">
-          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lessonContent }} />
-        </div>
-      </div>
-      
       <div className="flex justify-end">
         <Button onClick={handleSave}>
           Save Lesson

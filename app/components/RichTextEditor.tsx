@@ -15,13 +15,21 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
   const [embedError, setEmbedError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
   // Initialize the editor with initial content
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current.innerHTML = initialContent;
+      if (isInitialMount.current) {
+        editorRef.current.innerHTML = initialContent;
+        // Ensure there's always a paragraph for cursor position
+        if (!editorRef.current.querySelector('p')) {
+          editorRef.current.innerHTML = '<p><br></p>';
+        }
+        isInitialMount.current = false;
+      }
     }
-  }, []);
+  }, [initialContent]);
 
   const formatText = (command: string, value: string = '') => {
     document.execCommand(command, false, value);
@@ -30,7 +38,33 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
 
   const updateContent = () => {
     if (editorRef.current) {
+      // Store current selection
+      const selection = window.getSelection();
+      const range = selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+      
+      // Ensure there's always a paragraph at the end for cursor position
+      if (!editorRef.current.querySelector('p:last-child')) {
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        editorRef.current.appendChild(p);
+      }
+      
+      // Preserve contentEditable=false on embedded content
+      const embeds = editorRef.current.querySelectorAll('.embedded-content');
+      embeds.forEach(embed => {
+        if (embed instanceof HTMLElement) {
+          embed.contentEditable = 'false';
+        }
+      });
+      
+      // Update content
       onChange(editorRef.current.innerHTML);
+      
+      // Restore selection if it was within the editor
+      if (range && editorRef.current.contains(range.commonAncestorContainer)) {
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
     }
   };
 
@@ -66,24 +100,51 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
       if (editorRef.current) {
         // Get current selection
         const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
+        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+        
+        // Create a wrapper for the embed
+        const wrapper = document.createElement('div');
+        wrapper.className = 'embedded-content';
+        wrapper.contentEditable = 'false';
+        wrapper.innerHTML = data.html;
+        
+        // Create a paragraph for the cursor
+        const paragraph = document.createElement('p');
+        paragraph.innerHTML = '<br>';
+        
+        if (range && editorRef.current.contains(range.commonAncestorContainer)) {
+          // Get the current block element
+          let currentBlock = range.commonAncestorContainer;
+          while (currentBlock && currentBlock.nodeType === Node.TEXT_NODE) {
+            currentBlock = currentBlock.parentNode as Node;
+          }
           
-          // Create a container for the embed HTML
-          const embedContainer = document.createElement('div');
-          embedContainer.innerHTML = data.html;
-          
-          // Insert at cursor position
-          range.insertNode(embedContainer);
-          
-          // Move cursor after the inserted content
-          range.setStartAfter(embedContainer);
-          range.setEndAfter(embedContainer);
-          selection.removeAllRanges();
-          selection.addRange(range);
+          // Insert the embed and paragraph
+          if (currentBlock && currentBlock.parentNode) {
+            currentBlock.parentNode.insertBefore(wrapper, currentBlock.nextSibling);
+            currentBlock.parentNode.insertBefore(paragraph, wrapper.nextSibling);
+            
+            // Set cursor to the new paragraph
+            const newRange = document.createRange();
+            newRange.selectNodeContents(paragraph);
+            newRange.collapse(true);
+            selection?.removeAllRanges();
+            selection?.addRange(newRange);
+          }
         } else {
-          // If no selection, append to the end
-          editorRef.current.innerHTML += data.html;
+          // If no valid selection, append to the end
+          editorRef.current.appendChild(wrapper);
+          editorRef.current.appendChild(paragraph);
+          
+          // Set cursor to the new paragraph
+          const newRange = document.createRange();
+          newRange.selectNodeContents(paragraph);
+          newRange.collapse(true);
+          selection?.removeAllRanges();
+          selection?.addRange(newRange);
+          
+          // Scroll the new content into view
+          paragraph.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
         
         // Update content
@@ -98,6 +159,23 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
       console.error('Error embedding content:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+    // Store selection before updating content
+    const selection = window.getSelection();
+    const range = selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+    
+    // Update content
+    updateContent();
+    
+    // Restore selection
+    if (range && editorRef.current?.contains(range.commonAncestorContainer)) {
+      requestAnimationFrame(() => {
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      });
     }
   };
 
@@ -120,12 +198,38 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
         </Button>
       </div>
 
+      <style jsx global>{`
+        .embedded-content {
+          position: relative;
+          margin: 1rem 0;
+          padding: 1rem;
+          background: #f8f9fa;
+          border-radius: 0.5rem;
+        }
+        .embedded-content iframe {
+          display: block;
+          margin: 0 auto;
+          max-width: 100%;
+          border: none;
+        }
+        .editor-content p {
+          min-height: 1.5em;
+          margin: 0.5em 0;
+        }
+        .editor-content p:first-child {
+          margin-top: 0;
+        }
+        .editor-content p:last-child {
+          margin-bottom: 0;
+        }
+      `}</style>
+
       <div
         ref={editorRef}
-        className="border rounded-md p-4 h-64 overflow-auto prose max-w-none"
+        className="editor-content border rounded-md p-4 h-64 overflow-auto prose max-w-none"
         contentEditable
         suppressContentEditableWarning
-        onInput={updateContent}
+        onInput={handleInput}
         dir="ltr"
       />
 
@@ -143,6 +247,12 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
               onChange={handleEmbedUrlChange}
               placeholder="https://www.youtube.com/watch?v=..."
               className="w-full px-3 py-2 border rounded-md mb-4"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleEmbed();
+                }
+              }}
             />
             
             {embedError && (
