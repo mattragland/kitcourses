@@ -1,4 +1,15 @@
 function initializeDatabase(db) {
+  // Create users table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Create courses table
   db.exec(`
     CREATE TABLE IF NOT EXISTS courses (
@@ -6,8 +17,10 @@ function initializeDatabase(db) {
       title TEXT NOT NULL,
       description TEXT NOT NULL,
       image_url TEXT,
+      creator_id INTEGER,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
     )
   `);
 

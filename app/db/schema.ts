@@ -5,6 +5,7 @@ export interface Course {
   title: string;
   description: string;
   image_url: string;
+  creator_id?: number;
   created_at: string;
   updated_at: string;
 }
@@ -29,7 +30,26 @@ export interface Lesson {
   updated_at: string;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export function initializeDatabase(db: Database) {
+  // Create users table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Create courses table
   db.exec(`
     CREATE TABLE IF NOT EXISTS courses (
@@ -37,8 +57,10 @@ export function initializeDatabase(db: Database) {
       title TEXT NOT NULL,
       description TEXT NOT NULL,
       image_url TEXT,
+      creator_id INTEGER,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
     )
   `);
 

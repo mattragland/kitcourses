@@ -6,6 +6,11 @@ export function getAllCourses(): Course[] {
   return db.prepare('SELECT * FROM courses ORDER BY created_at DESC').all() as Course[];
 }
 
+export function getCoursesByCreatorId(creatorId: number): Course[] {
+  const db = getDatabase();
+  return db.prepare('SELECT * FROM courses WHERE creator_id = ? ORDER BY created_at DESC').all(creatorId) as Course[];
+}
+
 export function getCourseById(id: number): Course | undefined {
   const db = getDatabase();
   return db.prepare('SELECT * FROM courses WHERE id = ?').get(id) as Course | undefined;
@@ -13,11 +18,11 @@ export function getCourseById(id: number): Course | undefined {
 
 export function createCourse(course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): number {
   const db = getDatabase();
-  const { title, description, image_url } = course;
+  const { title, description, image_url, creator_id } = course;
   
   const result = db.prepare(
-    'INSERT INTO courses (title, description, image_url) VALUES (?, ?, ?)'
-  ).run(title, description, image_url);
+    'INSERT INTO courses (title, description, image_url, creator_id) VALUES (?, ?, ?, ?)'
+  ).run(title, description, image_url, creator_id);
   
   return result.lastInsertRowid as number;
 }
@@ -30,7 +35,7 @@ export function updateCourse(id: number, course: Partial<Omit<Course, 'id' | 'cr
     return false;
   }
   
-  const { title, description, image_url } = course;
+  const { title, description, image_url, creator_id } = course;
   const updates: string[] = [];
   const values: any[] = [];
   
@@ -49,8 +54,13 @@ export function updateCourse(id: number, course: Partial<Omit<Course, 'id' | 'cr
     values.push(image_url);
   }
   
+  if (creator_id !== undefined) {
+    updates.push('creator_id = ?');
+    values.push(creator_id);
+  }
+  
   if (updates.length === 0) {
-    return true; // Nothing to update
+    return false;
   }
   
   updates.push('updated_at = CURRENT_TIMESTAMP');

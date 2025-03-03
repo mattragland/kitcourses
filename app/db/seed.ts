@@ -1,5 +1,6 @@
 import { getDatabase } from './db';
 import { createCourse, createSection, createLesson } from './courseRepository';
+import { getMockCreator } from './userRepository';
 
 /**
  * Seeds the database with initial data
@@ -17,23 +18,29 @@ export function seedDatabase() {
   
   console.log('Seeding database...');
   
+  // Get or create the mock creator
+  const creator = getMockCreator();
+  
   // Create courses
   const webDevCourseId = createCourse({
     title: 'Web Development Fundamentals',
     description: 'Learn the basics of web development, including HTML, CSS, and JavaScript. This course is perfect for beginners who want to start building websites.',
-    image_url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80'
+    image_url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80',
+    creator_id: creator.id
   });
   
   const reactCourseId = createCourse({
     title: 'React for Beginners',
     description: 'Learn React from scratch and build modern, interactive web applications. This course covers components, state, props, hooks, and more.',
-    image_url: 'https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+    image_url: 'https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    creator_id: creator.id
   });
   
   const pythonCourseId = createCourse({
     title: 'Python Programming',
     description: 'Master Python programming with this comprehensive course. Learn syntax, data structures, functions, and build real-world applications.',
-    image_url: 'https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80'
+    image_url: 'https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80',
+    creator_id: creator.id
   });
   
   // Create sections for Web Development course

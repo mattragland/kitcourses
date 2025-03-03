@@ -1,5 +1,6 @@
 const { getDatabase } = require('./db');
 const { createCourse, createSection, createLesson } = require('./courseRepository');
+const { getMockCreator } = require('./userRepository');
 
 /**
  * Seeds the database with initial data
@@ -17,23 +18,29 @@ function seedDatabase() {
   
   console.log('Seeding database...');
   
+  // Get or create the mock creator
+  const creator = getMockCreator();
+  
   // Create courses
   const webDevCourseId = createCourse({
     title: 'Web Development Fundamentals',
     description: 'Learn the basics of web development, including HTML, CSS, and JavaScript. This course is perfect for beginners who want to start building websites.',
-    image_url: '/placeholder-course.jpg'
+    image_url: '/placeholder-course.jpg',
+    creator_id: creator.id
   });
   
   const reactCourseId = createCourse({
     title: 'React for Beginners',
     description: 'Learn React from scratch and build modern, interactive web applications. This course covers components, state, props, hooks, and more.',
-    image_url: '/placeholder-course.jpg'
+    image_url: '/placeholder-course.jpg',
+    creator_id: creator.id
   });
   
   const pythonCourseId = createCourse({
     title: 'Python Programming',
     description: 'Master Python programming with this comprehensive course. Learn syntax, data structures, functions, and build real-world applications.',
-    image_url: '/placeholder-course.jpg'
+    image_url: '/placeholder-course.jpg',
+    creator_id: creator.id
   });
   
   // Create sections for Web Development course

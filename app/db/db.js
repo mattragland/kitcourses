@@ -1,6 +1,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const { initializeDatabase } = require('./schema');
+require('./server-only');
 
 // Create a singleton database connection
 let db = null;

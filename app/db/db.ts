@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { initializeDatabase } from './schema';
+import './server-only';
 
 // Create a singleton database connection
 let db: Database.Database | null = null;

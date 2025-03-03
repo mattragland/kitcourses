@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
     const courseId = createCourse({
       title: body.title,
       description: body.description,
-      image_url: body.image_url || null
+      image_url: body.image_url || null,
+      creator_id: body.creator_id || null
     });
     
     return NextResponse.json({ id: courseId }, { status: 201 });

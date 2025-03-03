@@ -21,6 +21,9 @@ export default function Header() {
           <Link href="/about" className="text-gray-600 hover:text-black">
             About
           </Link>
+          <Link href="/creator" className="text-gray-600 hover:text-black">
+            Creator Dashboard
+          </Link>
         </nav>
         
         <div className="flex items-center space-x-4">
