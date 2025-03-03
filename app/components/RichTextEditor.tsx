@@ -212,9 +212,45 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
           max-width: 100%;
           border: none;
         }
+        .editor-content {
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .editor-content h2 {
+          font-size: 1.5em;
+          font-weight: 600;
+          margin: 1em 0 0.5em;
+          line-height: 1.3333333;
+        }
+        .editor-content h3 {
+          font-size: 1.25em;
+          font-weight: 600;
+          margin: 1em 0 0.5em;
+          line-height: 1.6;
+        }
         .editor-content p {
           min-height: 1.5em;
           margin: 0.5em 0;
+          line-height: 1.5;
+        }
+        .editor-content ul {
+          list-style-type: disc;
+          margin: 0.5em 0;
+          padding-left: 1.625em;
+        }
+        .editor-content ol {
+          list-style-type: decimal;
+          margin: 0.5em 0;
+          padding-left: 1.625em;
+        }
+        .editor-content pre {
+          background-color: #f8f9fa;
+          border-radius: 0.375rem;
+          padding: 1em;
+          margin: 0.5em 0;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 0.875em;
+          line-height: 1.7142857;
+          overflow-x: auto;
         }
         .editor-content p:first-child {
           margin-top: 0;
@@ -226,7 +262,7 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
 
       <div
         ref={editorRef}
-        className="editor-content border rounded-md p-4 h-64 overflow-auto prose max-w-none"
+        className="editor-content border rounded-md p-4 h-64 overflow-auto"
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}
