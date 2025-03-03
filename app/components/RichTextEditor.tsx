@@ -182,20 +182,34 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
   return (
     <div className="border rounded-md p-4">
       <div className="flex flex-wrap gap-2 mb-4 border-b pb-4">
-        <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<h2>')}>H2</Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<h3>')}>H3</Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<p>')}>Paragraph</Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => formatText('insertUnorderedList')}>Bullet List</Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => formatText('insertOrderedList')}>Numbered List</Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<pre>')}>Code</Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => setShowEmbedModal(true)}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-          </svg>
-          Embed
-        </Button>
+        <div className="flex gap-2 items-center border-r pr-2 mr-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('bold')} title="Bold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('italic')} title="Italic">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('underline')} title="Underline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+          </Button>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<h2>')}>H2</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<h3>')}>H3</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<p>')}>Paragraph</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('insertUnorderedList')}>Bullet List</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('insertOrderedList')}>Numbered List</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => formatText('formatBlock', '<pre>')}>Code</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => setShowEmbedModal(true)}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Embed
+          </Button>
+        </div>
       </div>
 
       <style jsx global>{`
@@ -257,6 +271,16 @@ export default function RichTextEditor({ initialContent = '', onChange }: RichTe
         }
         .editor-content p:last-child {
           margin-bottom: 0;
+        }
+        /* Text formatting styles */
+        .editor-content b, .editor-content strong {
+          font-weight: 600;
+        }
+        .editor-content i, .editor-content em {
+          font-style: italic;
+        }
+        .editor-content u {
+          text-decoration: underline;
         }
       `}</style>
 
