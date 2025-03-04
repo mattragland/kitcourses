@@ -3,18 +3,19 @@ import { Button } from '@/components/ui/button';
 import { getCoursesByCreatorId } from '@/app/db/courseRepository';
 import { getMockCreator } from '@/app/db/userRepository';
 import { Metadata } from 'next';
+import { Course } from '@/app/db/schema';
 
 export const metadata: Metadata = {
   title: 'Creator Dashboard - Kit Course',
   description: 'Manage your courses and create new content.',
 };
 
-export default function CreatorDashboard() {
+export default async function CreatorDashboard() {
   // Get the mock creator for development (will be replaced with auth)
   const creator = getMockCreator();
   
   // Get courses created by this user
-  const courses = getCoursesByCreatorId(creator.id);
+  const courses = await getCoursesByCreatorId(creator.id);
   
   return (
     <div className="container mx-auto px-4 py-12">

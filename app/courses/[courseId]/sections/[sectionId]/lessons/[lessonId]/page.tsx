@@ -13,7 +13,7 @@ interface LessonPageProps {
 }
 
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
-  const lessonId = parseInt(params.lessonId);
+  const lessonId = parseInt(await params.lessonId);
   
   if (isNaN(lessonId)) {
     return {
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
     };
   }
   
-  const lesson = getLessonById(lessonId);
+  const lesson = await getLessonById(lessonId);
   
   if (!lesson) {
     return {
@@ -35,17 +35,21 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
   };
 }
 
-export default function LessonPage({ params }: LessonPageProps) {
-  const courseId = parseInt(params.courseId);
-  const sectionId = parseInt(params.sectionId);
-  const lessonId = parseInt(params.lessonId);
+export default async function LessonPage({ params }: LessonPageProps) {
+  // Parse and validate IDs
+  const courseId = parseInt(await params.courseId);
+  const sectionId = parseInt(await params.sectionId);
+  const lessonId = parseInt(await params.lessonId);
   
   if (isNaN(courseId) || isNaN(sectionId) || isNaN(lessonId)) {
     notFound();
   }
   
-  const course = getCourseById(courseId);
-  const lesson = getLessonById(lessonId);
+  // Fetch required data
+  const [course, lesson] = await Promise.all([
+    getCourseById(courseId),
+    getLessonById(lessonId)
+  ]);
   
   if (!course || !lesson) {
     notFound();
@@ -89,7 +93,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   }
   
   // Get all lessons in this section for navigation
-  const lessons = getLessonsBySectionId(sectionId);
+  const lessons = await getLessonsBySectionId(sectionId);
   
   // Find current lesson index
   const currentIndex = lessons.findIndex(l => l.id === lessonId);
@@ -114,36 +118,28 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }} />
       </div>
       
+      {/* Navigation between lessons */}
       <div className="flex justify-between">
         {prevLesson ? (
           <Button variant="outline" asChild>
             <Link href={`/courses/${courseId}/sections/${sectionId}/lessons/${prevLesson.id}`}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mr-2 h-4 w-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-              </svg>
-              Previous Lesson
+              ← Previous Lesson
             </Link>
           </Button>
         ) : (
-          <div></div>
+          <div /> /* Empty div for spacing */
         )}
         
         {nextLesson ? (
           <Button asChild>
             <Link href={`/courses/${courseId}/sections/${sectionId}/lessons/${nextLesson.id}`}>
-              Next Lesson
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="ml-2 h-4 w-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
+              Next Lesson →
             </Link>
           </Button>
         ) : (
           <Button asChild>
             <Link href={`/courses/${courseId}`}>
-              Complete Course
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="ml-2 h-4 w-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              Complete Section →
             </Link>
           </Button>
         )}

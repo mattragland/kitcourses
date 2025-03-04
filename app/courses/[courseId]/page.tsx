@@ -14,7 +14,7 @@ interface CoursePageProps {
 }
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
-  const courseId = parseInt(params.courseId);
+  const courseId = parseInt(await params.courseId);
   
   if (isNaN(courseId)) {
     return {
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
     };
   }
   
-  const course = getCourseById(courseId);
+  const course = await getCourseById(courseId);
   
   if (!course) {
     return {
@@ -36,29 +36,29 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
   };
 }
 
-export default function CoursePage({ params }: CoursePageProps) {
-  const courseId = parseInt(params.courseId);
+export default async function CoursePage({ params }: CoursePageProps) {
+  const courseId = parseInt(await params.courseId);
   
   if (isNaN(courseId)) {
     notFound();
   }
   
-  const course = getCourseById(courseId);
+  const course = await getCourseById(courseId);
   
   if (!course) {
     notFound();
   }
   
-  const sections = getSectionsByCourseId(courseId);
+  const sections = await getSectionsByCourseId(courseId);
   
   // Get lessons for each section
-  const sectionsWithLessons = sections.map(section => {
-    const lessons = getLessonsBySectionId(section.id);
+  const sectionsWithLessons = await Promise.all(sections.map(async section => {
+    const lessons = await getLessonsBySectionId(section.id);
     return {
       ...section,
       lessons
     };
-  });
+  }));
   
   return (
     <div className="container mx-auto py-8 px-4">
